@@ -10,6 +10,7 @@ interface Props {
     selectedStation: ChannelIndexes;
     setSelectedStation: React.Dispatch<React.SetStateAction<ChannelIndexes>>;
 }
+
 export default function StationsDropdown({selectedStation, setSelectedStation}: Props) {
     const {data: stations} = useQuery(['stations'], async () => getStations());
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Menu, MenuButton, Button, MenuList, MenuItem} from '@chakra-ui/react';
 import {FaChevronDown} from 'react-icons/fa';
-import {formatDate} from './utils';
+import {formatDate} from './dateUtils';
 
 interface Props {
     selectedDate: Date;

@@ -3,8 +3,6 @@ import {screen, renderWithQueryClient, waitFor} from '../test-utils';
 import {App} from '../App';
 import * as api from '../api';
 import {mockedPrograms} from '../mockData';
-import {setDefaultOptions} from 'date-fns';
-import {is} from 'date-fns/locale';
 
 describe('App', () => {
     beforeAll(() => {
