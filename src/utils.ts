@@ -1,4 +1,4 @@
-import {addDays, eachDayOfInterval, format, startOfDay} from 'date-fns';
+import {addDays, eachDayOfInterval, format, startOfDay, addMinutes} from 'date-fns';
 
 export const formatDate = (date: Date) => {
     return format(date, 'iii d. MMMM');
@@ -19,4 +19,8 @@ export const toAnsiString = (date: Date) => {
 
 export const formatTime = (date: Date) => {
     return format(date, 'HH:mm');
+};
+
+export const getEndTime = (date: Date, duration: number) => {
+    return format(addMinutes(date, duration), 'HH:mm');
 };

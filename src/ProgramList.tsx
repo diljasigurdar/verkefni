@@ -5,14 +5,14 @@ import {getStationsProgram} from './api';
 import {
     Accordion,
     AccordionButton,
-    AccordionIcon,
     AccordionItem,
     AccordionPanel,
     Box,
+    Spinner,
 } from '@chakra-ui/react';
 import {styled} from 'styled-components';
-import {formatTime} from './utils';
-import {FaCircle} from 'react-icons/fa';
+import {formatTime, getEndTime} from './utils';
+import {FaCircle, FaMinusCircle, FaPlusCircle} from 'react-icons/fa';
 
 const StyledContainer = styled.div`
     margin-top: 30px;
@@ -25,7 +25,7 @@ const StyledRowContainer = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    width: 100%;
+    width: 98%;
     align-items: center;
 `;
 
@@ -42,16 +42,33 @@ const StyledLeftBox = styled(Box)`
     align-items: center;
 `;
 
-const StyledP = styled.p`
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+const StyledP = styled.p<{$isExpanded: boolean}>`
+    ${props =>
+        !props.$isExpanded &&
+        `
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    `}
 `;
 
-const StyledTitle = styled.p`
+const StyledTitle = styled.p<{$isExpanded: boolean}>`
     margin-left: 20px;
     font-weight: 600;
     font-size: 20px;
+    text-align: left;
+    white-space: nowrap;
+    ${props =>
+        !props.$isExpanded &&
+        `
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 180px;
+    `}
+`;
+
+const StyledTime = styled.div`
+    width: 60px;
 `;
 
 const StyledCircle = styled(FaCircle)`
@@ -62,66 +79,105 @@ const StyledEpisodes = styled.div`
     margin-left: 20px;
 `;
 
+const StyledInfo = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 35%;
+`;
+
+const StyledDescription = styled.div`
+    text-align: left;
+    margin-top: 15px;
+`;
+
 interface Props {
     station: ChannelIndexes;
     date: string;
 }
 
 export default function ProgramList({station, date}: Props) {
-    const {data: programInfo} = useQuery(
-        ['programInfo', station],
-        async () => getStationsProgram(station, date),
-        {
-            enabled: !!(station && date),
-        }
-    );
+    const {
+        data: programInfo,
+        isError,
+        isLoading,
+    } = useQuery(['programInfo', station, date], async () => getStationsProgram(station, date), {
+        enabled: !!(station && date),
+        retry: false,
+    });
 
-    if (!programInfo) {
-        return <React.Fragment />;
+    if (isError) {
+        return (
+            <StyledContainer>
+                <div>Ekki náðist að hafa samband við vefþjón</div>
+            </StyledContainer>
+        );
     }
 
-    const singleProgramInfo = programInfo[0];
-    console.log(singleProgramInfo);
+    if (isLoading) {
+        return (
+            <StyledContainer>
+                <Spinner size={'xl'} />
+            </StyledContainer>
+        );
+    }
+
     return (
         <StyledContainer>
             <Accordion allowToggle>
-                <AccordionItem>
-                    {programInfo.map(info => {
-                        const {titill, upphaf, bannad, thattur, lysing, thattafjoldi} = info;
-
-                        return (
-                            <React.Fragment>
-                                <h2>
-                                    <AccordionButton>
-                                        <StyledRowContainer>
-                                            <StyledLeftBox as="span" flex="1" textAlign="left">
-                                                <div>{formatTime(new Date(upphaf))}</div>
-                                                <StyledTitle>{titill}</StyledTitle>
-                                                <StyledCircle
-                                                    size={20}
-                                                    color={bannad === 'Green' ? 'green' : 'blue'}
-                                                />
-                                                <StyledEpisodes>
-                                                    {thattur}/{thattafjoldi}
-                                                </StyledEpisodes>
-                                            </StyledLeftBox>
-                                            <StyledRightBox as="span" flex="1">
-                                                <StyledP>{lysing}</StyledP>
-                                            </StyledRightBox>
-                                        </StyledRowContainer>
-                                        <AccordionIcon />
-                                    </AccordionButton>
-                                </h2>
-                                <AccordionPanel>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                                    enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                                    nisi ut aliquip ex ea commodo consequat.
-                                </AccordionPanel>
-                            </React.Fragment>
-                        );
-                    })}
-                </AccordionItem>
+                {programInfo.map((info, index) => {
+                    const {isltitill, upphaf, bannad, thattur, lysing, thattafjoldi, slott} = info;
+                    return (
+                        <AccordionItem key={index}>
+                            {({isExpanded}) => (
+                                <React.Fragment>
+                                    <h2>
+                                        <AccordionButton>
+                                            <StyledRowContainer>
+                                                <StyledLeftBox as="span">
+                                                    <StyledTime>
+                                                        {formatTime(new Date(upphaf))}
+                                                    </StyledTime>
+                                                    <StyledTitle $isExpanded={isExpanded}>
+                                                        {isltitill}
+                                                    </StyledTitle>
+                                                    <StyledCircle size={22} color={bannad} />
+                                                    <StyledEpisodes>
+                                                        {thattur}/{thattafjoldi}
+                                                    </StyledEpisodes>
+                                                </StyledLeftBox>
+                                                <StyledRightBox as="span">
+                                                    <StyledP
+                                                        hidden={isExpanded}
+                                                        $isExpanded={isExpanded}
+                                                    >
+                                                        {lysing}
+                                                    </StyledP>
+                                                </StyledRightBox>
+                                            </StyledRowContainer>
+                                            {isExpanded ? <FaMinusCircle /> : <FaPlusCircle />}
+                                        </AccordionButton>
+                                    </h2>
+                                    <AccordionPanel marginLeft={'10px'}>
+                                        <StyledInfo>
+                                            <div>{info.midill_heiti}</div>|
+                                            <div>
+                                                {formatTime(new Date(upphaf))} -{' '}
+                                                {getEndTime(new Date(upphaf), slott)}
+                                            </div>
+                                            |
+                                            <div>
+                                                Þáttur {info.thattur} af {info.thattafjoldi}
+                                            </div>
+                                        </StyledInfo>
+                                        <StyledDescription>{lysing}</StyledDescription>
+                                    </AccordionPanel>
+                                </React.Fragment>
+                            )}
+                        </AccordionItem>
+                    );
+                })}
             </Accordion>
         </StyledContainer>
     );
