@@ -19,16 +19,11 @@ export type SingleProgram = {
     beint: number;
     frumsyning: number;
     framundan_i_beinni: number;
-    tegund: null | string;
     flokkur: string;
     adalhlutverk: string;
     leikstjori: string;
     ar: string;
     bannad: string;
-    recidefni: null | any;
-    recidlidur: null | any;
-    recidsyning: null | any;
-    refno: null | any;
     frelsi: number;
     netdagar: number;
     lysing: string;
