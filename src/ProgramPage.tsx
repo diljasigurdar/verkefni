@@ -1,6 +1,6 @@
 import * as React from 'react';
 import StationsDropdown from './StationsDropdown';
-import {constructIntervalDates, toAnsiString} from './utils';
+import {constructIntervalDates, toAnsiString} from './dateUtils';
 import DateDropdown from './DateDropdown';
 import {styled} from 'styled-components';
 import {ChannelIndexes} from './types';

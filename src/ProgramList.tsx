@@ -11,7 +11,7 @@ import {
     Spinner,
 } from '@chakra-ui/react';
 import {styled} from 'styled-components';
-import {formatTime, getEndTime} from './utils';
+import {formatTime, getEndTime} from './dateUtils';
 import {FaCircle, FaMinusCircle, FaPlusCircle} from 'react-icons/fa';
 
 const StyledContainer = styled.div`
@@ -144,7 +144,8 @@ export default function ProgramList({station, date}: Props) {
                                                     </StyledTitle>
                                                     <StyledCircle size={22} color={bannad} />
                                                     <StyledEpisodes>
-                                                        {thattur}/{thattafjoldi}
+                                                        {thattafjoldi !== 0 &&
+                                                            `${thattur}/${thattafjoldi}`}
                                                     </StyledEpisodes>
                                                 </StyledLeftBox>
                                                 <StyledRightBox as="span">
@@ -168,7 +169,9 @@ export default function ProgramList({station, date}: Props) {
                                             </div>
                                             |
                                             <div>
-                                                Þáttur {info.thattur} af {info.thattafjoldi}
+                                                {thattafjoldi !== 0
+                                                    ? `Þáttur ${info.thattur} af ${info.thattafjoldi}`
+                                                    : `Þáttur ${info.thattur}`}
                                             </div>
                                         </StyledInfo>
                                         <StyledDescription>{lysing}</StyledDescription>
